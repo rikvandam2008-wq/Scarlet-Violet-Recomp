@@ -1,0 +1,46 @@
+# build output
+bin/
+obj/
+publish/
+.vs/
+*.user
+
+# ---- never commit anything from a game, a console or a player ----
+# game dumps and keys
+*.nsp
+*.xci
+*.nsz
+*.xcz
+*.nca
+*.keys
+*.keys.txt
+prod.keys
+title.keys
+# game files and what's made from them
+extracted/
+extracted.new/
+exefs/
+romfs/
+romfs.bin
+aoc/
+*.bin
+lasgame.dll
+lasgame.dll.*
+generated*/
+# an install's player data (when run from inside the repo)
+games/
+mods/
+textures/
+save/
+logs/
+cache/
+screenshots/
+larecomp.ini
+setup.log
+tandem.json
+engine.id
+game.txt
+*.log
+# the engine and its libraries are a separate project
+PokeV-Recomp.exe
+*.dll

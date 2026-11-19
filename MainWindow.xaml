@@ -1,0 +1,482 @@
+<Window x:Class="Tandem.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Tandem Launcher" Width="1200" Height="760" MinWidth="980" MinHeight="640"
+        WindowStartupLocation="CenterScreen" Background="{StaticResource Bg}"
+        WindowStyle="None" ResizeMode="CanResize" Icon="Assets/tandem.ico">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="44" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0"/>
+    </WindowChrome.WindowChrome>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="236"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- sidebar -->
+        <Border Background="{StaticResource Panel}" BorderBrush="{StaticResource Line}" BorderThickness="0,0,1,0">
+            <DockPanel Margin="16,18,16,16">
+                <StackPanel DockPanel.Dock="Top">
+                    <StackPanel Orientation="Horizontal" Margin="4,0,0,22">
+                        <Grid Width="30" Height="30">
+                            <Ellipse Width="20" Height="20" HorizontalAlignment="Left" Fill="#E8553D" Opacity="0.95"/>
+                            <Ellipse Width="20" Height="20" HorizontalAlignment="Right" Fill="#8E5BE8" Opacity="0.85"/>
+                        </Grid>
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="Tandem" FontFamily="{StaticResource DisplayFont}" FontSize="19" FontWeight="SemiBold"/>
+                            <TextBlock Text="native launcher" Style="{StaticResource Caption}" Margin="0,-2,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <TextBlock Text="GAME" Style="{StaticResource Caption}" Margin="4,0,0,6"/>
+                    <Border Background="{StaticResource Bg}" CornerRadius="9" Padding="3" Margin="0,0,0,22">
+                        <UniformGrid Columns="2">
+                            <RadioButton x:Name="SegScarlet" Content="Scarlet" GroupName="game" Style="{StaticResource Seg}" Tag="#E8553D" Checked="Game_Checked"/>
+                            <RadioButton x:Name="SegViolet" Content="Violet" GroupName="game" Style="{StaticResource Seg}" Tag="#8E5BE8" Checked="Game_Checked"/>
+                        </UniformGrid>
+                    </Border>
+
+                    <TextBlock Text="LIBRARY" Style="{StaticResource Caption}" Margin="4,0,0,6"/>
+                    <RadioButton x:Name="NavPlay" Content="Play" GroupName="nav" Style="{StaticResource Nav}" IsChecked="True" Checked="Nav_Checked"/>
+                    <RadioButton x:Name="NavMods" Content="Mods" GroupName="nav" Style="{StaticResource Nav}" Checked="Nav_Checked"/>
+                    <RadioButton x:Name="NavDiscover" Content="Discover mods" GroupName="nav" Style="{StaticResource Nav}" Checked="Nav_Checked"/>
+                    <RadioButton x:Name="NavTextures" Content="Textures" GroupName="nav" Style="{StaticResource Nav}" Checked="Nav_Checked"/>
+                    <RadioButton x:Name="NavSettings" Content="Settings" GroupName="nav" Style="{StaticResource Nav}" Checked="Nav_Checked"/>
+                    <RadioButton x:Name="NavSetup" Content="Set up game" GroupName="nav" Style="{StaticResource Nav}" Checked="Nav_Checked"/>
+                    <RadioButton x:Name="NavAbout" Content="About" GroupName="nav" Style="{StaticResource Nav}" Checked="Nav_Checked"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+                    <TextBlock x:Name="SideStatus" Style="{StaticResource Caption}" Margin="4,0"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- content -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="44"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- title bar -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button Content="—" Style="{StaticResource BtnGhost}" Width="44" Click="Min_Click"/>
+                <Button Content="▢" Style="{StaticResource BtnGhost}" Width="44" Click="Max_Click"/>
+                <Button Content="✕" Style="{StaticResource BtnGhost}" Width="44" Click="Close_Click"/>
+            </StackPanel>
+
+            <!-- Play page -->
+            <Grid x:Name="PagePlay" Grid.Row="1">
+                <Canvas x:Name="HeroArt" ClipToBounds="True"/>
+                <StackPanel Margin="48,20,48,0" MaxWidth="620" HorizontalAlignment="Left">
+                    <TextBlock x:Name="GameCaption" Style="{StaticResource Caption}" Foreground="{DynamicResource Accent}" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="GameTitle" FontFamily="{StaticResource DisplayFont}" FontSize="46" FontWeight="Bold" Margin="0,4,0,0"/>
+                    <TextBlock x:Name="StateText" Style="{StaticResource Body}" Margin="0,6,0,18" FontSize="15"/>
+                    <WrapPanel x:Name="Chips" Margin="0,0,0,26"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="PlayButton" AutomationProperties.Name="Play game" Style="{StaticResource BtnAccent}" Padding="44,14" FontSize="18" Click="Play_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="M0,0 L12,7 L0,14 Z" Fill="White" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="PlayLabel" Text="Play" Foreground="White" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Content="Open game folder" Style="{StaticResource Btn}" Margin="12,0,0,0" Click="OpenGameFolder_Click"/>
+                    </StackPanel>
+
+                    <Border Style="{StaticResource Card}" Margin="0,34,0,0" Background="#E0171A21">
+                        <StackPanel>
+                            <TextBlock Text="Quick settings" Style="{StaticResource H2}" FontSize="15" Margin="0,0,0,12"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Frame rate" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
+                                    <ComboBox x:Name="QuickFps" Margin="0,0,12,0" SelectionChanged="Quick_Changed"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Resolution" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
+                                    <ComboBox x:Name="QuickRes" Margin="0,0,12,0" SelectionChanged="Quick_Changed"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
+                                    <CheckBox x:Name="QuickFull" Style="{StaticResource Switch}" Click="Quick_Changed">
+                                        <TextBlock Text="Fullscreen" Style="{StaticResource Body}"/>
+                                    </CheckBox>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- Mods page -->
+            <Grid x:Name="PageMods" Grid.Row="1" Visibility="Collapsed" Margin="40,8,40,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <DockPanel Margin="0,0,0,16">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="Install from file…" Style="{StaticResource BtnAccent}" Click="InstallFile_Click"/>
+                        <Button Content="Install folder…" Style="{StaticResource Btn}" Margin="8,0,0,0" Click="InstallFolder_Click"/>
+                        <Button Content="Open mods folder" Style="{StaticResource Btn}" Margin="8,0,0,0" Click="OpenMods_Click"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock x:Name="ModsTitle" Style="{StaticResource H1}"/>
+                        <TextBlock Style="{StaticResource Body}" Margin="0,4,0,0"
+                                   Text="Mods higher in the list win when two change the same file. Drop .zip / .7z / .rar files here to install them. Up to 15 can be on at once."/>
+                    </StackPanel>
+                </DockPanel>
+                <Border Grid.Row="1" Style="{StaticResource Card}" Padding="6" AllowDrop="True" Drop="Mods_Drop" Margin="0,0,0,16">
+                    <Grid>
+                        <TextBlock x:Name="ModsEmpty" Style="{StaticResource Body}" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"
+                                   Text="No mods yet.&#x0a;Find some under Discover mods, or drop an archive here."/>
+                        <ListBox x:Name="ModsList" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Stretch"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="b" CornerRadius="8" Padding="12,10" Margin="0,2" Background="Transparent">
+                                                    <ContentPresenter/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="b" Property="Background" Value="#12FFFFFF"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding Enabled, Mode=OneWay}" Click="ModToggle_Click" Tag="{Binding}" VerticalAlignment="Center" Margin="0,0,14,0"/>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding Detail}" Style="{StaticResource Caption}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button Content="▲" ToolTip="Higher priority" Style="{StaticResource BtnGhost}" Click="ModUp_Click" Tag="{Binding}"/>
+                                            <Button Content="▼" ToolTip="Lower priority" Style="{StaticResource BtnGhost}" Click="ModDown_Click" Tag="{Binding}"/>
+                                            <Button Content="Page" ToolTip="Open its GameBanana page" Style="{StaticResource BtnGhost}" Click="ModPage_Click" Tag="{Binding}"/>
+                                            <Button Content="Remove" Style="{StaticResource BtnGhost}" Foreground="#E07A6A" Click="ModDelete_Click" Tag="{Binding}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Discover page -->
+            <Grid x:Name="PageDiscover" Grid.Row="1" Visibility="Collapsed" Margin="40,8,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Margin="0,0,40,12">
+                    <TextBlock Text="Discover mods" Style="{StaticResource H1}"/>
+                    <TextBlock Style="{StaticResource Body}" Margin="0,4,0,0"
+                               Text="Mods for Scarlet &amp; Violet from GameBanana. Only files GameBanana's virus scan has cleared can be installed, and only their game-data part is used."/>
+                </StackPanel>
+                <DockPanel Grid.Row="1" Margin="0,0,40,14">
+                    <ComboBox x:Name="SortBox" DockPanel.Dock="Right" Margin="10,0,0,0" SelectionChanged="Sort_Changed"/>
+                    <Button DockPanel.Dock="Right" Content="Search" Style="{StaticResource BtnAccent}" Margin="10,0,0,0" Click="Search_Click"/>
+                    <TextBox x:Name="SearchBox" Style="{StaticResource Search}" KeyDown="Search_KeyDown"/>
+                </DockPanel>
+                <ScrollViewer x:Name="DiscoverScroll" Grid.Row="2" Padding="0,0,28,0" ScrollChanged="Discover_Scroll">
+                    <StackPanel>
+                        <ItemsControl x:Name="ModCards">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource BtnGhost}" Padding="0" Margin="0,0,14,14" Click="Card_Click" Tag="{Binding}" Width="246">
+                                        <Border Background="{StaticResource Panel}" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="10" Width="246">
+                                            <StackPanel>
+                                                <Border CornerRadius="10,10,0,0" Height="122" Background="{StaticResource Panel2}" ClipToBounds="True">
+                                                    <Image Source="{Binding Thumb, TargetNullValue={x:Null}}" Stretch="UniformToFill"/>
+                                                </Border>
+                                                <StackPanel Margin="12,10,12,12">
+                                                    <TextBlock Text="{Binding Name}" FontSize="13.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                                    <TextBlock Text="{Binding Author}" Style="{StaticResource Caption}" TextWrapping="NoWrap"/>
+                                                    <TextBlock Text="{Binding Stats}" Style="{StaticResource Caption}" Margin="0,6,0,0" TextWrapping="NoWrap"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock x:Name="DiscoverInfo" Style="{StaticResource Body}" HorizontalAlignment="Center" Margin="0,8,0,24"/>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- detail panel -->
+                <Border x:Name="DetailPanel" Grid.Column="1" Grid.RowSpan="3" Width="420" Visibility="Collapsed"
+                        Background="{StaticResource Panel}" BorderBrush="{StaticResource Line}" BorderThickness="1,0,0,0">
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Top" Margin="20,8,12,0">
+                            <Button DockPanel.Dock="Right" Content="✕" Style="{StaticResource BtnGhost}" Click="DetailClose_Click"/>
+                            <TextBlock x:Name="DetTitle" Style="{StaticResource H2}" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <ScrollViewer>
+                            <StackPanel Margin="20,6,20,20">
+                                <TextBlock x:Name="DetMeta" Style="{StaticResource Caption}"/>
+                                <Border CornerRadius="10" ClipToBounds="True" Margin="0,12,0,0" Background="{StaticResource Panel2}">
+                                    <Image x:Name="DetImage" Stretch="Uniform" MaxHeight="230"/>
+                                </Border>
+                                <TextBlock Text="Files" Style="{StaticResource H2}" FontSize="15" Margin="0,16,0,6"/>
+                                <ItemsControl x:Name="DetFiles">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{StaticResource Panel2}" CornerRadius="8" Padding="12,10" Margin="0,0,0,8">
+                                                <DockPanel>
+                                                    <Button DockPanel.Dock="Right" Content="Install" Style="{StaticResource BtnAccent}" IsEnabled="{Binding Installable}" Click="FileInstall_Click" Tag="{Binding}" VerticalAlignment="Center"/>
+                                                    <StackPanel Margin="0,0,10,0">
+                                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock Style="{StaticResource Caption}">
+                                                            <Run Text="{Binding SizeText, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding ScanText, Mode=OneWay}"/>
+                                                        </TextBlock>
+                                                        <TextBlock Text="{Binding Description}" Style="{StaticResource Caption}"/>
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <Button Content="Open on GameBanana" Style="{StaticResource Btn}" HorizontalAlignment="Left" Margin="0,4,0,0" Click="DetailOpen_Click"/>
+                                <TextBlock Text="About this mod" Style="{StaticResource H2}" FontSize="15" Margin="0,18,0,6"/>
+                                <TextBlock x:Name="DetText" Style="{StaticResource Body}"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </DockPanel>
+                </Border>
+            </Grid>
+
+            <!-- Textures page -->
+            <ScrollViewer x:Name="PageTextures" Grid.Row="1" Visibility="Collapsed">
+                <StackPanel Margin="40,8,40,24" MaxWidth="860" HorizontalAlignment="Left">
+                    <TextBlock Text="Textures" Style="{StaticResource H1}"/>
+                    <TextBlock Style="{StaticResource Body}" Margin="0,4,0,18"
+                               Text="Two kinds of retextures work with the native port. You only need either if you want the game to look different from the original - it runs fine without."/>
+
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                        <StackPanel>
+                            <DockPanel>
+                                <CheckBox x:Name="TexHd" DockPanel.Dock="Right" Style="{StaticResource Switch}" Click="TexHd_Click"/>
+                                <TextBlock Text="HD texture packs" Style="{StaticResource H2}"/>
+                            </DockPanel>
+                            <TextBlock Style="{StaticResource Body}" Margin="0,6,0,10"
+                                       Text="Higher-resolution versions of the game's own textures, swapped in while the game draws. Packs for this port name each image after the texture it replaces (0123456789abcdef.png / .dds). Emulator texture-replacement packs use other names and don't carry over."/>
+                            <TextBlock x:Name="TexHdCount" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Install pack…" Style="{StaticResource BtnAccent}" Click="TexInstall_Click"/>
+                                <Button Content="Open folder" Style="{StaticResource Btn}" Margin="8,0,0,0" Click="TexOpen_Click"/>
+                                <Button Content="Remove all" Style="{StaticResource Btn}" Margin="8,0,0,0" Click="TexClear_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                        <StackPanel>
+                            <TextBlock Text="Texture mods" Style="{StaticResource H2}"/>
+                            <TextBlock Style="{StaticResource Body}" Margin="0,6,0,10"
+                                       Text="Retextured Pokémon, characters, clothes and UI made for the game's files (most of what GameBanana has). They install and switch on and off like any other mod."/>
+                            <Button Content="Find texture mods" Style="{StaticResource Btn}" HorizontalAlignment="Left" Click="FindTextureMods_Click"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <DockPanel>
+                                <CheckBox x:Name="TexDump" DockPanel.Dock="Right" Style="{StaticResource Switch}" Click="TexDump_Click"/>
+                                <TextBlock Text="Make your own HD pack" Style="{StaticResource H2}"/>
+                            </DockPanel>
+                            <TextBlock Style="{StaticResource Body}" Margin="0,6,0,10"
+                                       Text="With this on, the game saves every texture it loads to textures\dump as you play (slower while on). Upscale those images with any AI upscaler, keep the file names, and install the results as an HD pack. Turn it off again when you've collected what you want."/>
+                            <Button Content="Open dump folder" Style="{StaticResource Btn}" HorizontalAlignment="Left" Click="TexDumpOpen_Click"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Settings page -->
+            <ScrollViewer x:Name="PageSettings" Grid.Row="1" Visibility="Collapsed">
+                <StackPanel Margin="40,8,40,24" MaxWidth="760" HorizontalAlignment="Left">
+                    <TextBlock x:Name="SettingsTitle" Style="{StaticResource H1}"/>
+                    <TextBlock Style="{StaticResource Body}" Margin="0,4,0,18"
+                               Text="Saved per game and used from the next start. Everything else is in the game itself: press F1 while playing."/>
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                        <StackPanel x:Name="SetDisplay">
+                            <TextBlock Text="Display" Style="{StaticResource H2}" Margin="0,0,0,12"/>
+                            <DockPanel Margin="0,0,0,12">
+                                <ComboBox x:Name="SetFps" DockPanel.Dock="Right" SelectionChanged="Setting_Changed"/>
+                                <TextBlock Text="Frame rate" Style="{StaticResource Body}" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,0,0,12">
+                                <ComboBox x:Name="SetRes" DockPanel.Dock="Right" SelectionChanged="Setting_Changed"/>
+                                <TextBlock Text="Internal resolution" Style="{StaticResource Body}" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <CheckBox x:Name="SetFull" Style="{StaticResource Switch}" Click="Setting_Changed" Margin="0,0,0,12">
+                                <TextBlock Text="Fullscreen" Style="{StaticResource Body}"/>
+                            </CheckBox>
+                            <CheckBox x:Name="SetShowFps" Style="{StaticResource Switch}" Click="Setting_Changed" Margin="0,0,0,12">
+                                <TextBlock Text="Show the frame rate" Style="{StaticResource Body}"/>
+                            </CheckBox>
+                            <CheckBox x:Name="SetHdr" Style="{StaticResource Switch}" Click="Setting_Changed">
+                                <TextBlock Text="HDR output (HDR display needed)" Style="{StaticResource Body}"/>
+                            </CheckBox>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                        <StackPanel>
+                            <TextBlock Text="Graphics" Style="{StaticResource H2}" Margin="0,0,0,12"/>
+                            <DockPanel Margin="0,0,0,12">
+                                <ComboBox x:Name="SetShadows" DockPanel.Dock="Right" SelectionChanged="Setting_Changed"/>
+                                <TextBlock Text="Shadow quality" Style="{StaticResource Body}" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <CheckBox x:Name="SetAo" Style="{StaticResource Switch}" Click="Setting_Changed" Margin="0,0,0,12">
+                                <TextBlock Text="Ambient occlusion" Style="{StaticResource Body}"/>
+                            </CheckBox>
+                            <CheckBox x:Name="SetGi" Style="{StaticResource Switch}" Click="Setting_Changed" Margin="0,0,0,12">
+                                <TextBlock Text="Indirect light" Style="{StaticResource Body}"/>
+                            </CheckBox>
+                            <CheckBox x:Name="SetAniso" Style="{StaticResource Switch}" Click="Setting_Changed">
+                                <TextBlock Text="Sharp texture filtering (16x anisotropic)" Style="{StaticResource Body}"/>
+                            </CheckBox>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Files" Style="{StaticResource H2}" Margin="0,0,0,12"/>
+                            <WrapPanel>
+                                <Button Content="Open saves" Style="{StaticResource Btn}" Margin="0,0,8,0" Click="OpenSaves_Click"/>
+                                <Button Content="Open game folder" Style="{StaticResource Btn}" Margin="0,0,8,0" Click="OpenGameFolder_Click"/>
+                                <Button Content="Open latest log" Style="{StaticResource Btn}" Click="OpenLog_Click"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Setup page -->
+            <Grid x:Name="PageSetup" Grid.Row="1" Visibility="Collapsed" Margin="40,8,40,16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel>
+                    <TextBlock x:Name="SetupTitle" Style="{StaticResource H1}"/>
+                    <TextBlock Style="{StaticResource Body}" Margin="0,4,0,14"
+                               Text="Makes the game from your own dumps: the base game, its 4.0.0 update and any DLC you own, plus the prod.keys from your own Switch. The code is recompiled on this PC; nothing is downloaded and nothing of the game leaves this PC."/>
+                </StackPanel>
+                <Grid Grid.Row="1" Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="1 · Build tools" Style="{StaticResource H2}" FontSize="15" Margin="0,0,0,8"/>
+                            <TextBlock x:Name="ToolList" Style="{StaticResource Body}" Margin="0,0,0,10"/>
+                            <WrapPanel>
+                                <Button x:Name="ToolInstall" Content="Install build tools" Style="{StaticResource Btn}" Margin="0,0,8,0" Click="ToolInstall_Click"/>
+                                <Button Content="Engine source…" Style="{StaticResource Btn}" Margin="0,0,8,0" Click="EnginePick_Click"/>
+                                <Button Content="Check again" Style="{StaticResource BtnGhost}" Click="ToolCheck_Click"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="2 · Your dumps" Style="{StaticResource H2}" FontSize="15" Margin="0,0,0,8"/>
+                            <TextBlock x:Name="DumpList" Style="{StaticResource Body}" Margin="0,0,0,10" Text="Choose the folder with your .nsp / .xci dumps and keys."/>
+                            <WrapPanel>
+                                <Button Content="Choose folder…" Style="{StaticResource Btn}" Margin="0,0,8,0" Click="DumpPick_Click"/>
+                                <Button x:Name="SetupGo" Content="Set up and compile" Style="{StaticResource BtnAccent}" Margin="0,0,8,0" Click="SetupGo_Click"/>
+                                <Button x:Name="RecompileGo" Content="Recompile only" Style="{StaticResource Btn}" Margin="0,0,8,0" Click="RecompileGo_Click"
+                                        ToolTip="Compile the game files already set up again (after an engine update)"/>
+                                <Button x:Name="SetupCancel" Content="Cancel" Style="{StaticResource BtnGhost}" Visibility="Collapsed" Click="SetupCancel_Click"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                <Border Grid.Row="2" Style="{StaticResource Card}" Padding="14">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                            <DockPanel>
+                                <TextBlock x:Name="SetupStep" DockPanel.Dock="Right" Style="{StaticResource Caption}"/>
+                                <TextBlock x:Name="SetupText" FontSize="14" FontWeight="SemiBold" Text="Not started"/>
+                            </DockPanel>
+                            <ProgressBar x:Name="SetupBar" Height="6" Margin="0,8,0,0" Maximum="1" Foreground="{DynamicResource Accent}"
+                                         Background="{StaticResource Panel2}" BorderThickness="0"/>
+                        </StackPanel>
+                        <TextBox x:Name="SetupLog" IsReadOnly="True" Background="{StaticResource Bg}" Foreground="{StaticResource Soft}"
+                                 BorderThickness="0" FontFamily="Cascadia Mono, Consolas" FontSize="11.5" Padding="8"
+                                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="NoWrap"/>
+                    </DockPanel>
+                </Border>
+            </Grid>
+
+            <!-- About page -->
+            <ScrollViewer x:Name="PageAbout" Grid.Row="1" Visibility="Collapsed">
+                <StackPanel Margin="40,8,40,24" MaxWidth="760" HorizontalAlignment="Left">
+                    <TextBlock Text="About" Style="{StaticResource H1}"/>
+                    <TextBlock Style="{StaticResource Body}" Margin="0,8,0,0">
+                        Tandem is a launcher and mod manager for native PC builds of Pokémon Scarlet and Violet, made from
+                        your own copies of the games: their code is recompiled ahead of time for x86-64, so no emulator runs
+                        while you play.
+                    </TextBlock>
+                    <TextBlock Text="Credits" Style="{StaticResource H2}" Margin="0,22,0,6"/>
+                    <TextBlock Style="{StaticResource Body}">
+                        The game engine this launcher starts - the static recompiler, the Switch OS and GPU reimplementation and
+                        the Scarlet / Violet support - is the work of others, used under the MIT license:
+                        <LineBreak/>• LAS Recomp by Peiikai (recompiler, runtime, renderers, shader translator)
+                        <LineBreak/>• ZA Recomp by Hexveil404 and contributors (Switch services, Pokémon engine support)
+                        <LineBreak/>• PokeV-Recomp by fabioschmidt01, Atterax, didslima and contributors (Violet port)
+                        <LineBreak/>Scarlet support and this launcher were added on top. Mods on GameBanana belong to their authors.
+                    </TextBlock>
+                    <TextBlock Text="Legal" Style="{StaticResource H2}" Margin="0,22,0,6"/>
+                    <TextBlock Style="{StaticResource Body}">
+                        A fan project, not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company.
+                        Pokémon, Scarlet and Violet are trademarks of their owners. No game files are included: you need your
+                        own copies of the games.
+                    </TextBlock>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- status line -->
+            <Border Grid.Row="2" Background="{StaticResource Panel}" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="20,9">
+                <DockPanel>
+                    <ProgressBar x:Name="Progress" DockPanel.Dock="Right" Width="220" Height="6" Visibility="Collapsed"
+                                 Foreground="{DynamicResource Accent}" Background="{StaticResource Panel2}" BorderThickness="0" Maximum="1"/>
+                    <TextBlock x:Name="StatusLine" Style="{StaticResource Caption}" Foreground="{StaticResource Soft}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
