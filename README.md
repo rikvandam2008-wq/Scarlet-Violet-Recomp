@@ -17,6 +17,14 @@
 
 ---
 
+> [!TIP]
+> **This branch (`scarlet-violet`) runs Pokémon Scarlet *and* Violet 4.0.0, with Tandem Launcher.** One step builds
+> everything: double-click **`Build Tandem.bat`**. It installs the build tools if needed, builds the engine and the
+> launcher into `build\Tandem` and opens the launcher. There, pick Scarlet or Violet and use **Set up game** with your own
+> dumps (base game, 4.0.0 update, DLC) and the `prod.keys` from your own Switch: the code is compiled on your PC. The
+> launcher also manages mods (GameBanana browser included), HD textures and settings. See
+> [launcher/README.md](launcher/README.md). No game files are in this repository or are ever downloaded.
+
 > [!WARNING]
 > **Work in progress: expect bugs and crashes.**
 > PokeV-Recomp is still at an early stage. Even in my own testing and my friends', there are graphical glitches,

@@ -3,6 +3,8 @@
 *.py text eol=lf
 *.spec text eol=lf
 Makefile text eol=lf
+*.bat text eol=crlf
+tools/tandem/*.ps1 text eol=crlf
 Containerfile text eol=lf
 *.png binary
 *.jpg binary

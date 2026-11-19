@@ -24,10 +24,10 @@ made by static recompilation from your own copies of the games.
 ## Requirements
 
 - Windows 10 / 11 x64, a Vulkan 1.3 GPU, an AVX2 CPU, .NET 8 Desktop Runtime.
-- The game engine: the Scarlet / Violet build of PokeV-Recomp (`scarlet-violet` branch), built from source. Tandem
-  finds its source folder next to the install, or pick it under *Set up game > Engine source*.
-- For setting a game up: MSYS2 (clang, make), Python 3.12 and the .NET 8 SDK. *Set up game > Install build tools* runs
-  the engine's own `tools/setup_windows.ps1` to install them.
+- The engine is the rest of this repository. `Build Tandem.bat` (repository root) installs the build tools if they're
+  missing (MSYS2 with clang and make, Python 3.12, the .NET 8 SDK), builds the engine and the launcher with
+  `make tandem`, and puts both in `build\Tandem`. The install remembers this source folder (`tandem.json`): setting a game
+  up compiles it from here.
 
 ## Install layout
 
@@ -40,9 +40,9 @@ made by static recompilation from your own copies of the games.
 
 ## Building
 
-```
-dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish
-```
+Everything at once, from the repository root: `Build Tandem.bat` (or `make tandem [TANDEM=<folder>]` in an MSYS2
+shell). The launcher alone: `dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o
+publish` in this folder.
 
 ## Credits
 

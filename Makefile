@@ -374,3 +374,23 @@ smoketest:
 
 build/test_shaders: tools/test_shaders.m runtime/nvn/maxwell/translate.c runtime/nvn/maxwell/shader.h
 	clang -O1 -fobjc-arc -framework Metal -framework Foundation -o $@ tools/test_shaders.m runtime/nvn/maxwell/translate.c
+
+# ---- Tandem: the launcher (launcher/, .NET 8) and the engine in one ready-to-use folder, $(TANDEM) (build/Tandem by
+# default; `make tandem TANDEM=D:/Games/Tandem` for another place - an existing install is updated in place, its games/
+# folder untouched). No game code is in it: games are set up from the player's own dumps in the launcher (Set up game),
+# which compiles them with this source tree (its path goes in tandem.json). TANDEM_GEN must stay the flags
+# launcher/Core/GameSetup.cs compiles games with: they're part of GAMELIB_ID, and a game library only loads into an
+# engine built with the same ones. (One step for players: Build Tandem.bat.)
+TANDEM     ?= build/Tandem
+TANDEM_GEN := GENARCH=-march=x86-64-v3 "GENOPT=-O1 -DGUEST_VOLATILE"
+tandem:
+	@[ "$(PLATFORM)" = windows ] || { echo "make tandem: Windows only (the launcher is WPF)"; exit 1; }
+	$(MAKE) B=build/app GEN=generated-none $(TANDEM_GEN) build/app/PokeV-Recomp.exe
+	cd launcher && dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true \
+		-p:IncludeNativeLibrariesForSelfExtract=true -o ../build/launcher
+	mkdir -p "$(TANDEM)"
+	cp -f build/app/PokeV-Recomp.exe "build/launcher/Tandem Launcher.exe" "$(TANDEM)/"
+	ldd build/app/PokeV-Recomp.exe | awk '/ucrt64/ {print $$3}' | sort -u | while read -r d; do cp -f "$$d" "$(TANDEM)/"; done
+	printf '{\n  "EngineSource": "%s"\n}\n' "$$(cygpath -w "$(CURDIR)" | sed 's/\\/\\\\/g')" > "$(TANDEM)/tandem.json"
+	@echo "Tandem is in $(TANDEM): start \"Tandem Launcher.exe\" and set your games up there."
+.PHONY: tandem

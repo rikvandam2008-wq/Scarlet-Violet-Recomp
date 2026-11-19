@@ -38,6 +38,8 @@ public sealed class Toolchain
         string? saved = null;
         try { if (File.Exists(ConfigFile)) saved = JsonSerializer.Deserialize<Config>(File.ReadAllText(ConfigFile))?.EngineSource; } catch { }
         var candidates = new List<string?> { saved, Environment.GetEnvironmentVariable("TANDEM_ENGINE"), Path.Combine(Games.InstallDir, "engine") };
+        // built by `make tandem` into the source tree (build\Tandem): the folders above it
+        for (var up = Path.GetDirectoryName(Games.InstallDir); up != null; up = Path.GetDirectoryName(up)) candidates.Add(up);
         var parent = Path.GetDirectoryName(Games.InstallDir);
         if (parent != null) try { candidates.AddRange(Directory.GetDirectories(parent)); } catch { }
         t.EngineSource = candidates.FirstOrDefault(IsEngine);
