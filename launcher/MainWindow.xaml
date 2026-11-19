@@ -454,11 +454,23 @@
                     <TextBlock Text="Credits" Style="{StaticResource H2}" Margin="0,22,0,6"/>
                     <TextBlock Style="{StaticResource Body}">
                         The game engine this launcher starts - the static recompiler, the Switch OS and GPU reimplementation and
-                        the Scarlet / Violet support - is the work of others, used under the MIT license:
-                        <LineBreak/>• LAS Recomp by Peiikai (recompiler, runtime, renderers, shader translator)
-                        <LineBreak/>• ZA Recomp by Hexveil404 and contributors (Switch services, Pokémon engine support)
-                        <LineBreak/>• PokeV-Recomp by fabioschmidt01, Atterax, didslima and contributors (Violet port)
-                        <LineBreak/>Scarlet support and this launcher were added on top. Mods on GameBanana belong to their authors.
+                        the Pokémon engine and Violet support - is the work of others, used under the MIT license:
+                        <LineBreak/>• LAS Recomp by Peiikai and contributors (recompiler, runtime, renderers, shader translator)
+                        <LineBreak/>• ZA Recomp by Hexveil404, Primus92, Atterax, wimw85, lucabravi, gabrielsem16-bot,
+                        gdsistemas-web and contributors (Switch services, Pokémon engine support, the game-file importer)
+                        <LineBreak/>• PokeV-Recomp by fabioschmidt01, Atterax, didslima and contributors (the Violet port)
+                        <LineBreak/>• Dear ImGui, AMD FSR 2, SMAA, ooz, Ryujinx-derived code, Intel XeSS, XeGTAO, SDL 3, FFmpeg,
+                        LLVM, LibHac and SharpCompress, each under its own license
+                        <LineBreak/>• Switchbrew, envytools and Ryujinx as references; GameBanana for the mod listings (mods belong
+                        to their authors)
+                        <LineBreak/>The full list is in CREDITS.md in the project's repository:
+                        github.com/rikvandam2008-wq/Scarlet-Violet-Recomp
+                    </TextBlock>
+                    <TextBlock Text="Made with Claude Code" Style="{StaticResource H2}" Margin="0,22,0,6"/>
+                    <TextBlock Style="{StaticResource Body}">
+                        This launcher, Scarlet support, the per-game data folders and the one-step build were made with Claude
+                        Code, Anthropic's AI coding tool. The engine underneath is the human-written work credited above.
+                        <LineBreak/><LineBreak/>This is a side project and may not be kept up to date.
                     </TextBlock>
                     <TextBlock Text="Legal" Style="{StaticResource H2}" Margin="0,22,0,6"/>
                     <TextBlock Style="{StaticResource Body}">

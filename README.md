@@ -20,6 +20,16 @@ copies of the games, with Tandem Launcher: game setup, mods, textures and settin
 > **Work in progress.** The engine underneath is an early port: expect graphical glitches, frame drops and crashes.
 > Please report them with the game's `logs\play.log`.
 
+> [!NOTE]
+> **Made with Claude Code.** Everything this repository adds on top of
+> [PokeV-Recomp](https://github.com/fabioschmidt01/PokeV-Recomp) - Scarlet support, the per-game data folders, Tandem
+> Launcher and the one-step build - was made with [Claude Code](https://claude.com/claude-code), Anthropic's AI coding
+> tool. The engine itself is the human-written work of the projects in [Credits](#credits).
+>
+> **Maintenance:** this is a side project, and it may not be kept up to date. Fixes in the upstream projects won't
+> necessarily reach this repository; issues and pull requests are welcome, but responses may be slow or not come at
+> all. You're free to fork it (MIT).
+
 ## What it is
 
 The games' ARM64 code is translated ahead of time into C and compiled for x86-64 on your PC. The Switch's operating
@@ -89,7 +99,9 @@ Never commit or attach game files, extracted data, generated code (`generated-*`
 
 ## Credits
 
-This project stands on the work of others, used under the MIT license:
+**Almost all of the code in this repository comes from other people's projects.** The full list - every project,
+contributor, vendored library, build tool and reference, and exactly what this project added and how - is in
+**[CREDITS.md](CREDITS.md)**. In short, used under the MIT license:
 
 - **[Peiikai](https://github.com/peiikai)**: [LAS Recomp](https://github.com/peiikai/LASRecomp), the static recompiler,
   runtime, renderers and shader translator everything here is built on.
@@ -98,8 +110,11 @@ This project stands on the work of others, used under the MIT license:
 - **[fabioschmidt01](https://github.com/fabioschmidt01)**, [Atterax](https://github.com/Atterax),
   [didslima](https://github.com/didslima) and contributors: [PokeV-Recomp](https://github.com/fabioschmidt01/PokeV-Recomp),
   the Pokémon Violet port.
-- **Ryujinx** as a behavioural reference, **envytools** and **Switchbrew** for documentation, and the libraries listed in
-  [docs/LASRecomp-README.md](docs/LASRecomp-README.md). Mods on GameBanana belong to their authors.
+- Vendored code under its own licenses: Dear ImGui, AMD FSR 2, SMAA, ooz (GPL 3), Ryujinx-derived code, the Intel
+  XeSS SDK, LAS-Randomizer; plus SDL 3, FFmpeg, LLVM, LibHac, SharpCompress and the other libraries in CREDITS.md.
+- **Ryujinx** as a behavioural reference, **envytools** and **Switchbrew** for documentation. Mods on GameBanana belong
+  to their authors.
+- New code in this repository: made with [Claude Code](https://claude.com/claude-code) (see CREDITS.md).
 
 ## License
 

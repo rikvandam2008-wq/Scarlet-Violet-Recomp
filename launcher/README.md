@@ -44,9 +44,15 @@ Everything at once, from the repository root: `Build Tandem.bat` (or `make tande
 shell). The launcher alone: `dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o
 publish` in this folder.
 
+## Made with Claude Code
+
+Tandem Launcher was made with [Claude Code](https://claude.com/claude-code), Anthropic's AI coding tool, as new code
+for this project (it doesn't copy the upstream start screen; it works with the engine's file layout, settings and mod
+format, which it reads and writes as the engine expects). It may not be kept up to date.
+
 ## Credits
 
-The engine Tandem starts is the work of others, used under the MIT license: **LAS Recomp** by Peiikai (recompiler,
+The full list is in [CREDITS.md](../CREDITS.md). The engine Tandem starts is the work of others, used under the MIT license: **LAS Recomp** by Peiikai (recompiler,
 runtime, renderers, shader translator), **ZA Recomp** by Hexveil404 and contributors (Switch services, Pokémon engine
 support) and **PokeV-Recomp** by fabioschmidt01, Atterax, didslima and contributors (the Violet port). Mods on GameBanana
 belong to their authors. Archive extraction: [SharpCompress](https://github.com/adamhathcock/sharpcompress) (MIT).
