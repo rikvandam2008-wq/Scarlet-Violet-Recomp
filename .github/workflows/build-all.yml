@@ -1,9 +1,9 @@
 name: Build PokeV-Recomp (Windows & Linux)
 
+# Upstream PokeV-Recomp's release packaging (its own start screen, Violet only), kept for reference. Manual only in
+# Scarlet-Violet-Recomp: players build Tandem (engine + launcher) with "Build Tandem.bat", and no game code is ever
+# built here - games are compiled on the player's PC from their own dumps.
 on:
-  push:
-    branches: [main]
-    tags: ['v*']
   workflow_dispatch:
 
 permissions:

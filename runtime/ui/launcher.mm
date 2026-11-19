@@ -111,8 +111,8 @@ static void lang_update(void) { g_pt = settings_ui_portuguese(); }  // (runtime/
 // number; other tags are ignored. Offline / no curl / anything unexpected: nothing is shown.
 // (PokeV-Recomp's own releases: until v0.0.15 this asked ZA Recomp's, so the start screen offered another project's
 // versions as updates)
-#define RELEASES_URL "https://api.github.com/repos/fabioschmidt01/PokeV-Recomp/releases?per_page=100"
-#define RELEASE_PAGE "https://github.com/fabioschmidt01/PokeV-Recomp/releases/tag/"
+#define RELEASES_URL "https://api.github.com/repos/rikvandam2008-wq/Scarlet-Violet-Recomp/releases?per_page=100"
+#define RELEASE_PAGE "https://github.com/rikvandam2008-wq/Scarlet-Violet-Recomp/releases/tag/"
 
 static long long tag_rank(const std::string &t) {
     int n, a, b, c;
@@ -3152,10 +3152,10 @@ extern "C" void launcher_run(const char *root) {
                                        "este projeto não tem ligação com eles.");
                 y += text(dl, F_BODY, 16, x, y, C_SOFT, about, w).y + 26;
                 if (button("##gh", TR("Project page (GitHub)", "Página do projeto (GitHub)"), x, y, 0, 48, BTN_SECONDARY))
-                    SDL_OpenURL("https://github.com/fabioschmidt01/PokeV-Recomp");
+                    SDL_OpenURL("https://github.com/rikvandam2008-wq/Scarlet-Violet-Recomp");
                 float bx2 = x + ImGui::GetItemRectSize().x / g_s + 12;
                 if (button("##issues", TR("Report a problem", "Relatar um problema"), bx2, y, 0, 48, BTN_SECONDARY))
-                    SDL_OpenURL("https://github.com/fabioschmidt01/PokeV-Recomp/issues");
+                    SDL_OpenURL("https://github.com/rikvandam2008-wq/Scarlet-Violet-Recomp/issues");
                 bx2 += ImGui::GetItemRectSize().x / g_s + 12;
                 if (button("##logs", TR("Open the logs folder", "Abrir a pasta de logs"), bx2, y, 0, 48, BTN_SECONDARY, true, IC_FOLDER))
                     reveal_folder("logs");

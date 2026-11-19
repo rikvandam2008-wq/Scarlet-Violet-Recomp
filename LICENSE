@@ -1,6 +1,9 @@
 MIT License
 
 Copyright (c) 2026 Peiikai
+Copyright (c) 2026 Hexveil404 and ZA Recomp contributors
+Copyright (c) 2026 fabioschmidt01 and PokeV-Recomp contributors
+Copyright (c) 2026 Scarlet-Violet-Recomp contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,5 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This license covers LAS Recomp's own code. It does not cover The Legend of Zelda: Link's Awakening or any other
-Nintendo property, nor the third-party components in third_party/, which keep their own licenses.
+This license covers the project's own code (LAS Recomp, ZA Recomp, PokeV-Recomp, Scarlet-Violet-Recomp and Tandem
+Launcher in launcher/). It does not cover Pokémon Scarlet, Pokémon Violet, The Legend of Zelda: Link's Awakening or any
+other Nintendo, Game Freak, Creatures or The Pokémon Company property, nor the third-party components in third_party/,
+which keep their own licenses. No game code, assets, keys or files made from them are part of this repository.
