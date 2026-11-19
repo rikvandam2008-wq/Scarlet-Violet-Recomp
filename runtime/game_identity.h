@@ -18,11 +18,15 @@ typedef struct {
     const char *game;     // for messages: "Pokémon Legends: Arceus"
     const char *version;  // "1.1.1"
     bool supported;       // PokeV-Recomp sets it up and compiles it
+    const char *slot;     // the data folder it belongs in (runtime/paths.c rt_game_slot: "violet" / "scarlet"); NULL: none
 } GameIdentity;
 
 static const GameIdentity GAME_IDENTITIES[] = {
-    // Pokémon Violet 4.0.0 (update v786432; title 01008F6008C5E000): the one game PokeV-Recomp runs
-    {{0x70, 0x9b, 0xfd, 0x66, 0x11, 0x52, 0x98, 0x64}, "Pok\xc3\xa9mon Violet", "4.0.0", true},
+    // Pokémon Violet 4.0.0 (update v786432; title 01008F6008C5E000)
+    {{0x70, 0x9b, 0xfd, 0x66, 0x11, 0x52, 0x98, 0x64}, "Pok\xc3\xa9mon Violet", "4.0.0", true, "violet"},
+    // Pokémon Scarlet 4.0.0 (update v786432; title 0100A3D008C5C000): Violet's build but for its version flag
+    // (tools/sv_patches.py SV_BUILDS), so the same patches and runtime addresses
+    {{0x42, 0x1c, 0x54, 0x11, 0xb4, 0x87, 0xeb, 0x4d}, "Pok\xc3\xa9mon Scarlet", "4.0.0", true, "scarlet"},
     // recognised only (refused, with their name)
     {{0xae, 0xe8, 0xf1, 0x50, 0xdd, 0xa1, 0xb5, 0xa8}, "Pok\xc3\xa9mon Legends: Arceus", "1.1.1", false},
     {{0x72, 0x22, 0xe1, 0x3e, 0xcf, 0x6a, 0xdb, 0x32}, "Pok\xc3\xa9mon Legends: Z-A", "1.0.0", false},
@@ -42,6 +46,13 @@ static inline const GameIdentity *game_identity_find(const uint8_t id[8]) {
 static inline const char *game_identity_supported(const uint8_t id[8]) {
     const GameIdentity *g = game_identity_find(id);
     return g && g->supported ? g->version : NULL;
+}
+
+// As game_identity_supported, and only for the game whose data folder this is (Scarlet's files never set up in
+// Violet's folder or the other way round: different code, different compiled game library)
+static inline const char *game_identity_supported_in(const uint8_t id[8], const char *slot) {
+    const GameIdentity *g = game_identity_find(id);
+    return g && g->supported && g->slot && slot && !strcmp(g->slot, slot) ? g->version : NULL;
 }
 
 // The build ID of a main module (false: no such file, or too short to be one)

@@ -87,7 +87,7 @@ static void save_png(id<MTLTexture> tex, const char *path) {
 // The version of a main module's build id: NULL = not Pokémon Violet 4.0.0 (runtime/game_identity.h). Link's
 // Awakening, Z-A and Legends: Arceus builds used to pass here too, so another recomp's extracted/ in the data folder
 // counted as set up ("Compile now" on Arceus's files, issue #1): they are refused now, by name.
-static const char *build_version(const uint8_t id[8]) { return game_identity_supported(id); }
+static const char *build_version(const uint8_t id[8]) { return game_identity_supported_in(id, rt_game_slot()); }
 // Set up from the player's .xci / .nsp and keys by the bundled tools/zaimport (romfs.bin + aoc/, no romfs/ copy), or
 // from an extracted exefs + romfs (a romfs/ folder): every supported build is a packaged one (no region_common/)
 static bool build_is_za(const uint8_t id[8]) { return build_version(id) != NULL; }
@@ -412,11 +412,12 @@ static const char *fail_head(int k, bool pt) {
 static const char *fail_hint(int k, bool pt) {
     static const char *const en[] = {
         "",
-        "Choose the folder with your Pok\xc3\xa9mon Violet extracted (exefs and romfs folders), or with your "
+        "Choose the folder with your Pok\xc3\xa9mon Scarlet or Violet extracted (exefs and romfs folders), or with your "
         "dump (.xci / .nsp) and your prod.keys.",
-        "Pok\xc3\xa9mon Violet's base game isn't among those files. Choose the folder with your own dump.",
+        "The base game selected at the top right (Scarlet or Violet) isn't among those files. Choose the folder with "
+        "your own dump.",
         "Make sure there's about 12 GB free and try again.",
-        "PokeV-Recomp runs version 4.0.0 of the game (base game + update v786432).",
+        "PokeV-Recomp runs version 4.0.0 of the game (base game + its 4.0.0 update), and only the game selected at the top right.",
         "Some files are missing. Choose the folder again; if it happens again, dump the game again.",
         "Make sure there's about 4 GB free and try again. If it keeps happening, report it on GitHub.",
         "Put the prod.keys (and title.keys) dumped from your own Switch in the folder with the game files. Any file "
@@ -481,7 +482,8 @@ static std::string build_id_detail(const std::string &main_path) {
     if (!read_build_id(main_path, id)) return "";
     char what[128];
     game_identity_describe(id, what, sizeof what);
-    fprintf(stderr, "[launcher] %s: %s, not Pok\xc3\xa9mon Violet 4.0.0 - refused\n", main_path.c_str(), what);
+    fprintf(stderr, "[launcher] %s: %s, not Pok\xc3\xa9mon %s 4.0.0 - refused\n", main_path.c_str(), what,
+            !strcmp(rt_game_slot(), "scarlet") ? "Scarlet" : "Violet");
     return std::string(TR("These files are ", "Esses arquivos são de ")) + what + ".";
 }
 
@@ -624,6 +626,9 @@ static bool import_packages(const std::vector<std::string> &pkgs, const std::str
     std::string log = g_root + "/import.log";
     std::vector<const char *> argv = {tool};
     if (!title_keys.empty()) argv.push_back("--title-keys"), argv.push_back(title_keys.c_str());
+    // only the selected game's packages (a folder with both Scarlet's and Violet's: the other one's are left alone)
+    argv.push_back("--title");
+    argv.push_back(!strcmp(rt_game_slot(), "scarlet") ? "0100A3D008C5C000" : "01008F6008C5E000");
     argv.push_back(keys.c_str());
     argv.push_back(g_root.c_str());
     for (auto &p : pkgs) argv.push_back(p.c_str());
@@ -2277,7 +2282,9 @@ extern "C" void launcher_run(const char *root) {
     settings_load();
     lang_update();
     static bool update_checked;  // (once per launch, not again after a "Title screen" reboot)
-    if (!update_checked && !getenv("LARECOMP_NO_UPDATE_CHECK")) {
+    // (off in this Scarlet + Violet build: the releases it checks are upstream PokeV-Recomp's, Violet-only - installing
+    // one over this folder would drop Scarlet. LARECOMP_UPDATE_CHECK=1 turns it back on.)
+    if (!update_checked && getenv("LARECOMP_UPDATE_CHECK") && !getenv("LARECOMP_NO_UPDATE_CHECK")) {
         update_checked = true;
         pthread_t t;
         if (pthread_create(&t, NULL, update_thread, NULL) == 0) pthread_detach(t);
@@ -2592,6 +2599,34 @@ extern "C" void launcher_run(const char *root) {
                      tab_names[i]);
                 tx += tw + 4;
             }
+            {  // SCARLET | VIOLET: which game this start screen sets up and plays. Each has its own data folder
+                // (runtime/paths.c, games/<slot>: game files, compiled code, saves, settings, mods), so switching
+                // writes game.txt and starts the app again in the other one. Not while a setup or compile runs.
+                float sw = 200, sx = W_ - 24 - 92 - 12 - sw, sy = 17, sh = 30;
+                bool scarlet_now = !strcmp(rt_game_slot(), "scarlet");
+                dl->AddRectFilled(P(sx, sy), P(sx + sw, sy + sh), IM_COL32(255, 255, 255, 18), sh / 2 * g_s);
+                for (int i = 0; i < 2; i++) {
+                    bool on = (i == 0) == scarlet_now;
+                    float bx = sx + 3 + i * (sw - 6) / 2, bw = (sw - 6) / 2;
+                    ImU32 col = i == 0 ? IM_COL32(224, 72, 52, 255) : IM_COL32(138, 92, 214, 255);
+                    ImGui::SetCursorScreenPos(P(bx, sy + 3));
+                    ImGui::PushID(110 + i);
+                    ImGui::BeginDisabled(busy);
+                    if (ui_invisible_button("##game", S(bw, sh - 6), ImGuiButtonFlags_EnableNav) && !on) {
+                        settings_save();
+                        if (rt_game_select(i == 0 ? "scarlet" : "violet")) rt_paths_restart();
+                        else fprintf(stderr, "[launcher] couldn't save the game choice\n");
+                    }
+                    ImGui::EndDisabled();
+                    bool hot = item_hot();
+                    ImGui::PopID();
+                    if (on) dl->AddRectFilled(P(bx, sy + 3), P(bx + bw, sy + sh - 3), col, (sh - 6) / 2 * g_s);
+                    else if (hot && !busy) dl->AddRectFilled(P(bx, sy + 3), P(bx + bw, sy + sh - 3), IM_COL32(255, 255, 255, 30), (sh - 6) / 2 * g_s);
+                    const char *l = i == 0 ? "SCARLET" : "VIOLET";
+                    ImVec2 ts = text_size(F_LABEL, 13, l);
+                    text(dl, F_LABEL, 13, bx + (bw - ts.x) / 2, sy + (sh - ts.y) / 2, on ? IM_COL32(255, 255, 255, 255) : C_SOFT, l);
+                }
+            }
             {  // PT | EN
                 float sw = 92, sx = W_ - 24 - sw, sy = 17, sh = 30;
                 dl->AddRectFilled(P(sx, sy), P(sx + sw, sy + sh), IM_COL32(255, 255, 255, 18), sh / 2 * g_s);
@@ -2754,7 +2789,8 @@ extern "C" void launcher_run(const char *root) {
                                                  : TR("Set up the game files to play", "Prepare os arquivos do jogo para jogar")};
                 } else {
                     // ---- ready
-                    page_title(dl, x, 104, "POKÉMON VIOLET", TR("Ready to play", "Pronto para jogar"));
+                    page_title(dl, x, 104, !strcmp(rt_game_slot(), "scarlet") ? "POKÉMON SCARLET" : "POKÉMON VIOLET",
+                               TR("Ready to play", "Pronto para jogar"));
                     float ty = 196 + text(dl, F_BODY, 17, x, 196, C_SOFT, TR("Your game files are set up and the game's code "
                                                                               "is compiled for this PC.", "Os seus arquivos do "
                                                                               "jogo estão configurados e o código já foi "

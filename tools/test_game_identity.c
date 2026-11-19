@@ -79,14 +79,28 @@ int main(int argc, char **argv) {
     put_main(p, VIOLET_301, 0x44);
     CHECK(!game_identity_read(p, id));
 
-    // exactly one supported entry, and it is Violet 4.0.0
+    // Pokémon Scarlet 4.0.0: accepted too, in its own data folder only (and Violet only in Violet's)
+    static const uint8_t SCARLET_400[8] = {0x42, 0x1c, 0x54, 0x11, 0xb4, 0x87, 0xeb, 0x4d};
+    snprintf(p, sizeof p, "%s/scarlet_main", dir);
+    put_main(p, SCARLET_400, 0x80);
+    CHECK(game_identity_read(p, id));
+    CHECK(game_identity_supported(id) && !strcmp(game_identity_supported(id), "4.0.0"));
+    game_identity_describe(id, desc, sizeof desc);
+    CHECK(!strcmp(desc, "Pok\xc3\xa9mon Scarlet 4.0.0"));
+    CHECK(game_identity_supported_in(id, "scarlet") != NULL);
+    CHECK(game_identity_supported_in(id, "violet") == NULL);
+    CHECK(game_identity_supported_in(VIOLET_301, "violet") != NULL);
+    CHECK(game_identity_supported_in(VIOLET_301, "scarlet") == NULL);
+    CHECK(game_identity_supported_in(VIOLET_301, NULL) == NULL);
+
+    // exactly two supported entries: Violet 4.0.0 and Scarlet 4.0.0
     int supported = 0;
     for (size_t i = 0; i < sizeof GAME_IDENTITIES / sizeof *GAME_IDENTITIES; i++)
         if (GAME_IDENTITIES[i].supported) {
             supported++;
-            CHECK(!memcmp(GAME_IDENTITIES[i].id, VIOLET_301, 8));
+            CHECK(!memcmp(GAME_IDENTITIES[i].id, VIOLET_301, 8) || !memcmp(GAME_IDENTITIES[i].id, SCARLET_400, 8));
         }
-    CHECK(supported == 1);
+    CHECK(supported == 2);
 
     if (failures) { fprintf(stderr, "%d check(s) failed\n", failures); return 1; }
     printf("all checks passed\n");

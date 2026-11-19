@@ -15,6 +15,9 @@
 #include "platform.h"
 #include "gamebuild.h"  // (gamelib_old_cpu)
 #include <stdio.h>
+#ifdef _WIN32
+#include <windows.h>  // (CreateProcessA: handing over to Tandem Launcher)
+#endif
 #if defined(__x86_64__) || defined(__i386__)
 #include <cpuid.h>
 #endif
@@ -338,6 +341,26 @@ int main(int argc, char **argv) {
             fprintf(stderr, "[main] LARECOMP_NO_LAUNCHER is set: not showing the start screen - exiting\n");
             exit(3);
         }
+#ifdef _WIN32
+        // Tandem Launcher (its own program, next to this one) replaces the built-in start screen when it's there:
+        // started directly, or "Title screen" in game, this hands over to it and exits - the launcher picks the game
+        // and starts this program again with --play and LARECOMP_GAME. LARECOMP_FORCE_LAUNCHER: the built-in one.
+        if (title && !getenv("LARECOMP_FORCE_LAUNCHER")) {
+            char tl[1100];
+            if (rt_resource("Tandem Launcher.exe", NULL, tl, sizeof tl)) {
+                STARTUPINFOA si = {sizeof si};
+                PROCESS_INFORMATION pi;
+                char cmd[1200];
+                snprintf(cmd, sizeof cmd, "\"%s\"", tl);
+                if (CreateProcessA(tl, cmd, NULL, NULL, FALSE, 0, NULL, rt_exe_dir(), &si, &pi)) {
+                    CloseHandle(pi.hThread), CloseHandle(pi.hProcess);
+                    fprintf(stderr, "[main] handed over to %s\n", tl);
+                    fflush(stderr);
+                    _exit(0);  // (nothing of the game is up yet, or it was torn down: no cleanup to run)
+                }
+            }
+        }
+#endif
         if (title) {  // start screen (runtime/ui/launcher.mm): game files setup, seed choice, settings
             extern void launcher_run(const char *root);
             launcher_run(root);

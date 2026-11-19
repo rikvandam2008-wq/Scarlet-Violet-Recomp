@@ -173,6 +173,13 @@ static bool write_line(const char *path, const char *line) {
 
 static void join(char *out, size_t n, const char *dir, const char *name) { snprintf(out, n, "%s" SEP "%s", dir, name); }
 
+// line starts with word, ignoring case (0 = yes)
+static int _strnicmp_portable(const char *line, const char *word) {
+    for (; *word; line++, word++)
+        if ((*line | 0x20) != *word) return 1;
+    return 0;
+}
+
 // a and b are the same folder, or one is inside the other (unresolvable: treated as overlapping)
 static bool within(const char *child, const char *parent) {
     size_t n = strlen(parent);
@@ -221,6 +228,34 @@ static bool pointer_root(const char *home, char *out, size_t n) {
     return true;
 }
 
+// ---- which game: Scarlet and Violet side by side, each in its own folder (<data home>/games/<slot>: its extracted/,
+// save/, cache/, mods/, larecomp.ini...). The two are different builds with different code addresses, so nothing
+// compiled or cached for one is usable by the other; only the program is shared. The slot is LARECOMP_GAME (tests), else
+// the one line of <data home>/game.txt (the start screen's Scarlet | Violet switch writes it and restarts), else Violet.
+#define GAME_FILE "game.txt"
+static char g_slot[16];
+static const char *slot_pick(const char *home) {
+    if (g_slot[0]) return g_slot;
+    char line[64] = {0}, p[1100];
+    const char *env = getenv("LARECOMP_GAME");
+    if (env && *env) snprintf(line, sizeof line, "%s", env);
+    else { join(p, sizeof p, home, GAME_FILE); read_line(p, line, sizeof line); }
+    snprintf(g_slot, sizeof g_slot, "%s", !_strnicmp_portable(line, "scarlet") ? "scarlet" : "violet");
+    return g_slot;
+}
+const char *rt_game_slot(void) { return g_slot[0] ? g_slot : "violet"; }
+bool rt_game_select(const char *slot) {
+    char p[1100];
+    join(p, sizeof p, g_home, GAME_FILE);
+    mkdirs(g_home);
+    return write_line(p, strcmp(slot, "scarlet") ? "violet" : "scarlet");
+}
+static void slot_dir(char *root, size_t n, const char *home) {
+    char base[1024];
+    snprintf(base, sizeof base, "%s", root);
+    snprintf(root, n, "%s" SEP "games" SEP "%s", base, slot_pick(home));
+}
+
 bool rt_data_root_early(char *out, size_t n) {
     const char *env = getenv("LARECOMP_DATA_ROOT");
     if (env && *env) return (size_t)snprintf(out, n, "%s", env) < n;
@@ -228,6 +263,7 @@ bool rt_data_root_early(char *out, size_t n) {
     char home[1024];
     default_home(home, sizeof home);
     if (!pointer_root(home, out, n) || !is_dir(out)) snprintf(out, n, "%s", home);
+    slot_dir(out, n, home);
     return true;
 }
 
@@ -320,6 +356,7 @@ void rt_paths_init(void) {
                 remove(p);
             }
         }
+        slot_dir(root, sizeof root, g_home);  // (the selected game's own folder under it)
     }
     mkdirs(root);
     char msg[1400];
@@ -502,7 +539,9 @@ const char *rt_data_root_fixed(void) {
     const char *env = getenv("LARECOMP_DATA_ROOT");
     if (env && *env) return "Set by LARECOMP_DATA_ROOT.";
     if (g_dev) return "A source checkout uses its own folder.";
-    return NULL;
+    // (a move copies one folder and repoints the base: with a folder per game under it, that would strand the other
+    // game's data and nest this one a level too deep - so each game stays in games\<slot> next to the program)
+    return "Scarlet and Violet each keep their data in the games folder next to the program.";
 }
 
 static bool has_entries(const char *dir) {

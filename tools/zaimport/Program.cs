@@ -46,7 +46,13 @@ static int Fail(string why)
 static int Run(string[] args)
 {
     string? titleKeys = null;  // (--title-keys: the launcher found it by its contents, whatever its name)
-    if (args.Length >= 2 && args[0] == "--title-keys") (titleKeys, args) = (args[1], args[2..]);
+    ulong wantTitle = 0;       // (--title: only this game's packages - Scarlet and Violet set up from one folder holding both)
+    for (bool more = true; more && args.Length >= 2;)
+    {
+        if (args[0] == "--title-keys") (titleKeys, args) = (args[1], args[2..]);
+        else if (args[0] == "--title") (wantTitle, args) = (Convert.ToUInt64(args[1], 16), args[2..]);
+        else more = false;
+    }
     if (args.Length < 3) return Fail("usage: zaimport [--title-keys <title.keys>] <prod.keys> <out dir> <package.xci|nsp>...");
     string keyDir = Path.GetDirectoryName(Path.GetFullPath(args[0]))!;
     titleKeys ??= new[] { "title.keys", "title.keys.txt" }.Select(n => Path.Combine(keyDir, n)).FirstOrDefault(File.Exists);
@@ -70,7 +76,13 @@ static int Run(string[] args)
         else
         {
             var pfs = new PartitionFileSystem();
-            if (pfs.Initialize(st).IsFailure()) return Fail($"{Path.GetFileName(pkg)}: not an NSP or XCI");
+            if (pfs.Initialize(st).IsFailure())
+            {
+                // (skipped, not fatal: a folder can hold the other game's packages, a cut-off copy or an archive renamed
+                // .nsp - the game asked for may still be complete without it; if it isn't, the base / update checks say so)
+                Console.WriteLine($"warning: {Path.GetFileName(pkg)}: not an NSP or XCI (damaged, compressed or incomplete) - skipped");
+                continue;
+            }
             fs = pfs;
         }
         foreach (var e in fs.EnumerateEntries("/", "*.tik"))
@@ -96,7 +108,10 @@ static int Run(string[] args)
                                                 (0x0100A3D008C5C000, "Pokémon Scarlet"),
                                                 (0x0100F43008C44000, "Pokémon Legends Z-A"),
                                                 (0x01001F5010DFA000, "Pokémon Legends Arceus") };
-    ulong ZaBase = Games.Select(g => g.id).FirstOrDefault(id => ncas.Any(n => n.nca.Header.TitleId == id));
+    ulong ZaBase = Games.Select(g => g.id).Where(id => wantTitle == 0 || id == wantTitle)
+                        .FirstOrDefault(id => ncas.Any(n => n.nca.Header.TitleId == id));
+    if (wantTitle != 0 && ZaBase == 0)
+        return Fail($"the base game of {Games.FirstOrDefault(g => g.id == wantTitle).name ?? $"{wantTitle:x16}"} isn't among these files");
     foreach (var (nca, name) in ncas)
     {
         ulong tid = nca.Header.TitleId;

@@ -25,16 +25,18 @@ with tempfile.TemporaryDirectory() as directory:
 # The SV build id must agree with the generator's (tools/sv_patches.py SV_BUILDS: what gen.py patches as Violet)
 sv = (ROOT / 'tools/sv_patches.py').read_text()
 header = (ROOT / 'runtime/game_identity.h').read_text()
-m = re.search(r'\{\{([^}]*)\}, "Pok\\xc3\\xa9mon Violet", "4\.0\.0", true\}', header)
-assert m, 'Violet 4.0.0 entry not found in game_identity.h'
-violet = ''.join(b.strip()[2:] for b in m.group(1).split(','))
-assert f"'{violet}': '4.0.0'" in sv, f'{violet} is not tools/sv_patches.py SV_BUILDS\'s Violet 4.0.0'
+# (Scarlet too: each game's entry names its own data folder, the slot the start screen accepts it in)
+for game, slot in (('Violet', 'violet'), ('Scarlet', 'scarlet')):
+    m = re.search(r'\{\{([^}]*)\}, "Pok\\xc3\\xa9mon ' + game + r'", "4\.0\.0", true, "' + slot + r'"\}', header)
+    assert m, f'{game} 4.0.0 entry not found in game_identity.h'
+    bid = ''.join(b.strip()[2:] for b in m.group(1).split(','))
+    assert f"'{bid}': '4.0.0'" in sv, f'{bid} is not tools/sv_patches.py SV_BUILDS\'s {game} 4.0.0'
 
 # The start screen and main.c take the answer from the header: no build table of their own that could let another
 # game's files through again (v0.0.24's launcher accepted Arceus 1.1.1, Z-A and Link's Awakening)
 launcher = (ROOT / 'runtime/ui/launcher.mm').read_text()
 main = (ROOT / 'runtime/main.c').read_text()
-assert 'return game_identity_supported(id);' in launcher
+assert 'return game_identity_supported_in(id, rt_game_slot());' in launcher
 for src, name in ((launcher, 'launcher.mm'), (main, 'main.c')):
     for other in ('0xae, 0xe8, 0xf1, 0x50', '0x72, 0x22, 0xe1, 0x3e', '0xae, 0x16, 0xf7, 0x1e'):
         assert other not in src, f'{name} still lists another game\'s build id ({other})'

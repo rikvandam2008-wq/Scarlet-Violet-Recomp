@@ -35,6 +35,11 @@ bool rt_dev_mode(void);           // dev / portable mode (rule 2 above): e.g. a 
 // Before rt_paths_init (the session log): the data root by the rules above; false in dev mode
 bool rt_data_root_early(char *out, size_t n);
 
+// The game this run is for: "violet" or "scarlet" (its data folder is <data home>/games/<slot>; paths.c)
+const char *rt_game_slot(void);
+// The game the next start is for (then rt_paths_restart). false: game.txt couldn't be written.
+bool rt_game_select(const char *slot);
+
 // Choosing another data folder (the start screen). NULL = it can be changed; else why not (rules 1 / 2).
 const char *rt_data_root_fixed(void);
 typedef struct {

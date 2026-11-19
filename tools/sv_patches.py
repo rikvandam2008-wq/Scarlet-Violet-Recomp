@@ -5,6 +5,10 @@ import struct
 # main's build ID (first 16 hex digits) -> version
 SV_BUILDS = {
     '709bfd6611529864': '4.0.0',  # Pokémon Violet v786432 (4.0.0; called 3.0.1 here until v0.0.28, issue #3)
+    # Pokémon Scarlet v786432 (4.0.0): the same build as Violet's but for two instructions (0x700149b9c8: the version
+    # flag, Scarlet 0 / Violet 1; 0x700149b9d4: 0x32 / 0x33) and its build ID in .rodata - same segment sizes, identical
+    # sdk and subsdk0. Every address below is Violet's, unchanged (tools/sv_port.py checks them).
+    '421c5411b487eb4d': '4.0.0',
 }
 
 
